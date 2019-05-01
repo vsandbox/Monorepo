@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "@vladnets/monorepo",
+  "version": "1.0.0-alpha.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "exec:watch:monorepo-tools": "nodemon --watch packages/monorepo-tools/dist -e js packages/monorepo-tools/dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vladvsydorenko/Monorepo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vladvsydorenko/Monorepo/issues"
+  },
+  "homepage": "https://github.com/vladvsydorenko/Monorepo#readme",
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}
