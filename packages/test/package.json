@@ -1,5 +1,6 @@
 {
-  "name": "@vladnets/test",
+  "private": true,
+  "name": "vladnets-test",
   "version": "1.0.0-alpha.1",
   "description": "Test package",
   "main": "dist/index.js",

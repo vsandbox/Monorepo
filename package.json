@@ -19,5 +19,8 @@
   "homepage": "https://github.com/vladvsydorenko/Monorepo#readme",
   "devDependencies": {
     "nodemon": "^1.19.0"
+  },
+  "dependencies": {
+    "vladnets-test": "file:artifacts/vladnets-test/1.0.0-alpha.1.tgz"
   }
 }
