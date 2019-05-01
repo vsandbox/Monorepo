@@ -5,6 +5,7 @@ import childProcess from "child_process";
 const moveArtifact = (artifactName: string, artifactTargetPath: string, artifactDestPath: string) => {
     fs.copyFile(artifactTargetPath, artifactDestPath, (err) => {
         if (err) {
+            console.error(`AAA Error occured while artifact was moved to "${artifactTargetPath}"`);
             console.error(err);
             return;
         }
