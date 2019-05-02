@@ -1,0 +1,19 @@
+{
+    "artifactory": {
+        "targetDir": "artifacts",
+        "registry": {
+            "modes": {
+                "github-raw": {
+                    "port": 8090,
+                    "type": "remote",
+                    "url": "https://github.com/${name}/${version}?raw=true"
+                },
+                "local": {
+                    "port": 8090,
+                    "type": "local",
+                    "dir": "artifacts"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "name": "@vladnets/monorepo-artifact-test",
+  "version": "1.0.0-alpha.1",
+  "description": "Build monorepo artifacts",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "concurrently \"npm:build:watch\" \"npm:exec:watch\"",
+    "build:once": "webpack",
+    "build:watch": "webpack --watch",
+    "exec:once": "node ./dist/index.js",
+    "exec:watch": "nodemon -e js --watch dist --delay 2 --exec \"npm run exec:once\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^11.13.8",
+    "@types/webpack-env": "^1.13.9",
+    "concurrently": "^4.1.0",
+    "nodemon": "^1.19.0",
+    "ts-loader": "^5.4.4",
+    "typescript": "^3.4.5",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  }
+}
