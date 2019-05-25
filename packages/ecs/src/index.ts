@@ -1,27 +1,31 @@
-interface IComponent<T> {
-    type: symbol;
-}
+// interface IComponent<T> {
+//     type: symbol;
+//     index: number;
+// }
 
-const a: IComponent<number> = {
-    type: Symbol(),
-};
+// interface IEntity {
+//     id: symbol;
+//     type: symbol;
+// }
 
-interface IEntity {
-    id: symbol;
-    type: symbol;
-}
+// interface IComponentGroup {
+//     id: symbol;
+//     type: symbol;
+// }
 
-interface IGroup {
-    id: symbol;
-    type: symbol;
-}
+// interface IEntityManager {
 
-interface IEntityManager {
+//     setComponentData: <T, R extends T>(entity: IEntity, component: IComponent<T>, data: R) => void;
+//     getComponentData: <T, R extends T>(entity: IEntity, component: IComponent<T>) => R | null;
 
-    setComponentData: <T, R extends T>(entity: IEntity, component: IComponent<T>, data: R) => void;
+//     getOrCreateComponentGroup: (components: IComponent<any>[]) => IComponentGroup;
+// }
 
-    getComponentData: <T, R extends T>(entity: IEntity, component: IComponent<T>) => R;
+// const computeTypeHashSum = (componentArray: IComponent<any>[]) => {
+//     // Sort componentArray (or it should be sorted always)
 
-    createGroup: <T>(components: IComponent<any>[]) => IGroup;
+//     // Join each component's index
 
-}
+//     // [0, 2, 100].push(60)
+// };
+

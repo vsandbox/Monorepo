@@ -1,24 +1,10 @@
-declare const component1: {
-    id: number;
+declare let longIdParts: number[][];
+declare let longKeys: string[];
+declare let shortIdParts: number[][];
+declare let shortKeys: string[];
+declare let object: {
+    [key: string]: number;
 };
-declare const component2: {
-    id: number;
-};
-declare const component3: {
-    id: number;
-};
-declare const entity0: {
-    id: number;
-    components: {
-        id: number;
-    }[];
-};
-declare const entity1: {
-    id: number;
-    components: {
-        id: number;
-    }[];
-};
-declare const registry: {
-    [x: string]: {};
-};
+declare const keys: string[];
+declare const shortSum: number;
+declare const longSum: number;
