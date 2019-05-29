@@ -1,52 +1,16 @@
-interface IComponentDesc<T> {
-    initValue: () => T;
-}
-
-interface IComponent<T> {
-    index: number;
-}
-
+import { ComponentRegistry, IComponentDesc } from "../ComponentRegistry";
+import { IEntity } from "../IEntity";
 
 export class EntityManager {
 
-    private componentRegistry: {
-        componentArray: IComponent<any>[];
-        componentByDescMap: WeakMap<IComponentDesc<any>, IComponent<any>>;
-    } = {
-        componentArray: [],
-        componentByDescMap: new WeakMap<IComponentDesc<any>, IComponent<any>>(),
-    };
+    private componentRegistry = new ComponentRegistry();
 
-    public defineComponent<T>(componentDesc: IComponentDesc<T>): IComponent<T> {
-        const {
-            componentArray,
-            componentByDescMap,
-        } = this.componentRegistry;
+    public setComponentData<T, D extends T>(componentDesc: IComponentDesc<T>, entity: IEntity, data: D) {
+        this.componentRegistry.setComponentData(componentDesc, entity, data);
+    }
 
-
-        let component: IComponent<any>;
-
-        if (componentByDescMap.has(componentDesc)) {
-            component = componentByDescMap.get(componentDesc);
-        }
-        else {
-            const index = componentArray.length;
-            component = { index };
-            componentArray.push(component);
-            componentByDescMap.set(componentDesc, component);
-        }
-
-        return component;
+    public getComponentData<T, D extends T>(componentDesc: IComponentDesc<T>, entity: IEntity): T {
+        return this.componentRegistry.getComponentData(componentDesc, entity);
     }
 
 }
-
-const em = new EntityManager();
-const componentDesc: IComponentDesc<number> = {
-    initValue: () => 1,
-};
-
-const component = em.defineComponent(componentDesc);
-const componentAgain = em.defineComponent(componentDesc);
-
-console.log(component, componentAgain);

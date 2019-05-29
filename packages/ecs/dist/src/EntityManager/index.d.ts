@@ -1,11 +1,5 @@
-interface IComponentDesc<T> {
+export interface IComponentTypeDesc<T> {
     initValue: () => T;
 }
-interface IComponent<T> {
-    index: number;
+export interface IComponentTypeEntry {
 }
-export declare class EntityManager {
-    private componentRegistry;
-    defineComponent<T>(componentDesc: IComponentDesc<T>): IComponent<T>;
-}
-export {};
