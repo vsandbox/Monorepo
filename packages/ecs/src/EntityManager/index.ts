@@ -1,46 +1,52 @@
-interface IEntity {
-    id: symbol;
-}
-interface IComponent<T> {}
-
-interface IEntityArchetype {
-    id: symbol;
-    components: IComponent<any>[];
+interface IComponentDesc<T> {
+    initValue: () => T;
 }
 
-interface IComponentGroup {
-    id: symbol;
-    components: IComponent<any>[];
+interface IComponent<T> {
+    index: number;
 }
 
-class EntityManager {
 
-    private entitiesByArchetype: {
-        /** entityId: symbol, ts doesn't support yet */
-        [entityId: string]: IEntity[];
-    } = {};
+export class EntityManager {
 
-    private componentsGroupsById: {
-        /** groupId: symbol, ts doesn't support yet */
-        [groupId: string]: IComponentGroup;
-    }
-
-    private componentsDataByComponentType: {
-        /** componentType: symbol, ts doesn't support yet */
-        [componentType: string]: {
-            /** entityId: symbol, ts doesn't support yet */
-            [entityId: string]: any[];
-        };
+    private componentRegistry: {
+        componentArray: IComponent<any>[];
+        componentByDescMap: WeakMap<IComponentDesc<any>, IComponent<any>>;
+    } = {
+        componentArray: [],
+        componentByDescMap: new WeakMap<IComponentDesc<any>, IComponent<any>>(),
     };
 
-    public addComponent<T>(entity: IEntity, component: IComponent<T>) {
+    public defineComponent<T>(componentDesc: IComponentDesc<T>): IComponent<T> {
+        const {
+            componentArray,
+            componentByDescMap,
+        } = this.componentRegistry;
 
-    }
-    public removeComponent<T>(entity: IEntity, component: IComponent<T>) {
 
-    }
-    public setComponentData<T, R extends T>(entity: IEntity, component: IComponent<T>, data: R) {
+        let component: IComponent<any>;
 
+        if (componentByDescMap.has(componentDesc)) {
+            component = componentByDescMap.get(componentDesc);
+        }
+        else {
+            const index = componentArray.length;
+            component = { index };
+            componentArray.push(component);
+            componentByDescMap.set(componentDesc, component);
+        }
+
+        return component;
     }
 
 }
+
+const em = new EntityManager();
+const componentDesc: IComponentDesc<number> = {
+    initValue: () => 1,
+};
+
+const component = em.defineComponent(componentDesc);
+const componentAgain = em.defineComponent(componentDesc);
+
+console.log(component, componentAgain);
