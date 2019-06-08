@@ -47,3 +47,10 @@ export const makeConfig = (env: IMakeConfigEnv, userConfig: Configuration): Conf
 
     return resultConfig;
 };
+
+export const makeConfigArray = (configArray: [IMakeConfigEnv, Configuration][]) => {
+    console.log("\n\n----------- configArray\n\n--------", configArray);
+    return configArray.map(([env, config]) => {
+        return makeConfig(env, config);
+    });
+};

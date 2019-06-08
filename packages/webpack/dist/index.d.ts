@@ -1,1 +1,1 @@
-export { makeConfig, IMakeConfigEnv } from "./makeConfig";
+export { makeConfig, makeConfigArray, IMakeConfigEnv } from "./makeConfig";
