@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "@vladnets/test--nested-monorepo",
+  "version": "1.0.0-alpha.0",
+  "description": "",
+  "main": "dist/index.js",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "glob": "^7.1.4"
+  }
+}

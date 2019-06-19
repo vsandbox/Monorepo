@@ -1,0 +1,20 @@
+{
+  "packages": [
+    "packages/**/package.json"
+  ],
+  "buildConfigurations": {
+    "test": {
+      "packages": [
+        {
+          "name": "pkg1",
+          "watch": true,
+          "run": ["exec:once"]
+        },
+        {
+          "name": "pkg2",
+          "watch": true
+        }
+      ]
+    }
+  }
+}
