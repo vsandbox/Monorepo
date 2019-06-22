@@ -1,180 +1,110 @@
-// Read up first monorepo.json
-// Read all package.json according to monorepo.json
-// Build a package map - `name:path`
-// Link cross-dependencies according to packages' package.json
+// MR is build on idea of state-based workflow.
+// Means any possible action is just a function taking a state and returning new state.
+// E.g. If some action could want to add an Error, it just puts it in error array.
+// Then, error showing action will show all errors from array.
 
-import path from "path";
-import glob from "glob";
-import npm from "npm";
+/**
+ * Represents any possible state of application.
+ */
+interface IMRState {
+  errors: {
+    // Critical errors, means app can't go further
+    critErrorArray: any[];
 
-console.log("\n------------------------------\n");
-
-export interface IHash<T> {
-  [key: string]: T;
-}
-
-export interface IPackageConfig {
-  name: string;
-  relativePath: string;
-  dependencyPackageNameArray: string[];
-}
-
-export interface IMonorepoState {
-  cwd: string;
-  includePackagesGlob: string;
-  excludePackagesGlob: string;
-  mainPackageConfig: IPackageConfig;
-  packageConfigHash: IHash<IPackageConfig>;
-  packageLinkHash: IHash<IPackageConfig[]>;
-  dependencyPackageNameArray: string[];
-}
-
-const parseRawPackageConfig = (rawPackageConfig: any, relativePath: string): IPackageConfig => {
-  const dependencyHash = rawPackageConfig.dependencies || {};
-  const devDependencyHash = rawPackageConfig.devDependencies || {};
-  const commonDependencyHash = {...dependencyHash, ...devDependencyHash};
-  const dependencyPackageNameArray: string[] = Object.keys(commonDependencyHash);
-
-  return {
-    name: rawPackageConfig.name,
-    relativePath,
-    dependencyPackageNameArray,
+    // Errors like parsing package config (it could be ignored)
+    nonCritErrorArray: any[];
   };
-};
 
-export const readPackageConfigs = (state: IMonorepoState): Promise<IMonorepoState> => {
+  // Requests to do something on the next app iteration
+  requestArray: {
+    type: string;
+    [key: string]: any;
+  }[];
+}
+
+//
+
+import fs from "fs";
+import path from "path";
+
+export interface IFindFilePathArrayInput {
+  rootDirAbsPath: string;
+  currentRelPath: string;
+  lookingFileName: string;
+  breakFileNameArray: string;
+}
+
+export interface IFindFilePathArrayResult {
+  rootDirAbsPath: string;
+  fileRelPathArray: string[];
+}
+
+export const deepFindFileRelPathArrayInDir = (options: IFindFilePathArrayInput): Promise<IFindFilePathArrayResult> => {
+  const { rootDirAbsPath, currentRelPath, lookingFileName, breakFileNameArray } = options;
+
   return new Promise((resolve, reject) => {
-    const mainPackageConfigName = "package.json";
-    const mainPackageConfigPath = path.join(state.cwd, mainPackageConfigName);
-    let mainPackageConfig: IPackageConfig;
+    const currentAbsPath = path.join(rootDirAbsPath, currentRelPath);
 
-    let newState: IMonorepoState = {
-      ...state,
-    };
-
-    try {
-      const rawMainPackageConfig = __non_webpack_require__(mainPackageConfigPath);
-      mainPackageConfig = parseRawPackageConfig(rawMainPackageConfig, mainPackageConfigName);
-    } catch (err) {
-      reject(err);
-      return;
-    }
-
-    // read files by provided glob pattern (read package.json files as usually)
-    glob(state.includePackagesGlob, {
-      cwd: state.cwd,
-      ignore: state.excludePackagesGlob,
-    }, (err, fileNames) => {
+    fs.stat(currentAbsPath, (err, stats) => {
       if (err) {
         reject(err);
+      }
+
+      // Working only with directories
+      if (!stats.isDirectory()) {
+        resolve({
+          rootDirAbsPath,
+          fileRelPathArray: [],
+        });
         return;
       }
 
-      // fill the array with promises from config readers
-      const packageConfigPromiseArray: Promise<IPackageConfig>[] = fileNames.map(relativePath => {
-        return new Promise((resolvePackageConfigPromise, rejectPackageConfigPromise) => {
-          const packageConfigPath = path.join(state.cwd, relativePath);
+      fs.readdir(currentAbsPath, () => {
 
-          try {
-            const rawPackageConfig = __non_webpack_require__(packageConfigPath);
-            const packageConfig: IPackageConfig = parseRawPackageConfig(rawPackageConfig, relativePath);
-
-            resolvePackageConfigPromise(packageConfig);
-          }
-          catch (err) {
-            rejectPackageConfigPromise(err);
-          }
-        });
       });
 
-      // Wait until all package configs are read
-      Promise.all(packageConfigPromiseArray)
-        .then(packageConfigArray => {
-          const packageConfigHash = packageConfigArray.reduce<IHash<IPackageConfig>>((acc, packageConfig) => {
-            acc[packageConfig.name] = packageConfig;
-            return acc;
-          }, {});
-
-          const dependencyPackageNameArray = packageConfigArray.reduce<string[]>((acc, packageConfig) => {
-            acc = packageConfig.dependencyPackageNameArray.reduce<string[]>((nameArray, name) => {
-              if (!(name in packageConfigHash) && !nameArray.includes(name)) {
-                nameArray = [...nameArray, name];
-              }
-              return nameArray;
-            }, acc);
-
-            return acc;
-          }, []);
-
-          newState = {
-            ...newState,
-            mainPackageConfig,
-            packageConfigHash,
-            dependencyPackageNameArray,
-          };
-
-          resolve(newState);
-        })
-        .catch(err => {
-          reject(err);
-        });
     });
   });
 };
 
-export const updatePackageLinks = (state: IMonorepoState): IMonorepoState => {
-  const packageLinkHash = Object
-    .values(state.packageConfigHash)
-    .reduce<IHash<IPackageConfig[]>>((packageLinkHashAcc, packageConfig) => {
-      const packageLinks = packageConfig.dependencyPackageNameArray
-        .reduce<IPackageConfig[]>((packageLinksAcc, dependencyPackageName) => {
-          const packageConfig = state.packageConfigHash[dependencyPackageName];
-          if (packageConfig) {
-            packageLinksAcc = [...packageLinksAcc, packageConfig];
-          }
-          return packageLinksAcc;
-        }, []);
+// run x async actions in queued groups by y actions at a time
 
-      if (packageLinks.length > 0) {
-        packageLinkHashAcc = {
-          ...packageLinkHashAcc,
-          [packageConfig.name]: packageLinks,
-        };
-      }
+type TPromiseCreator<T_Input, T_Output> = (input: T_Input) => Promise<T_Output>;
+interface IPromiseHandler<T_Input, T_Output> {
+  input: T_Input;
+  create: TPromiseCreator<T_Input, T_Output>;
+  then: (output: T_Output) => void;
+  catch: (err: any) => void;
+}
+class PromiseManager<T_Input, T_Output> {
+  private maxActivePromiseCount: number;
 
-      return packageLinkHashAcc;
-    }, {});
+  private queuedHandlerArray: IPromiseHandler<T_Input, T_Output>[];
+  private activeHandlerArray: IPromiseHandler<T_Input, T_Output>[];
 
-  const newState: IMonorepoState = {
-    ...state,
-    packageLinkHash
-  };
-  return newState;
-};
+  private addToActive() {}
 
-export const linkPackages = (state: IMonorepoState): Promise<IMonorepoState> => {
-  return new Promise((resolve, reject) => {
-    const { packageLinkHash } = state;
+  public addInQueue(handler: IPromiseHandler<T_Input, T_Output>) {
+    if (this.activeHandlerArray.length < this.maxActivePromiseCount) {
+      const promise = handler.create(handler.input);
 
-    // Object.entries(packageLinkHash).map(() => {
+      promise
+        .then(handler.then)
+        .catch(handler.catch);
 
-    // });
-  });
-};
+      this.activeHandlerArray.push(handler);
+    }
+    else {
+      this.queuedHandlerArray.push(handler);
+    }
+  }
 
-const cwd = path.join(process.cwd(), "../test");
-const testState: IMonorepoState = {
-  cwd,
-  includePackagesGlob: "*/**/package.json",
-  excludePackagesGlob: "**/node_modules/**",
-  mainPackageConfig: null,
-  packageConfigHash: {},
-  packageLinkHash: {},
-  dependencyPackageNameArray: [],
-};
+  public onDone(handler: IPromiseHandler<T_Input, T_Output>) {
+    const handlerIndex = this.activeHandlerArray.indexOf(handler);
+    this.activeHandlerArray.splice(handlerIndex, 1);
 
-readPackageConfigs(testState).then((newTestState) => {
-  newTestState = updatePackageLinks(newTestState);
-  console.log(newTestState);
-});
+    if (this.queuedHandlerArray.length > 0) {
 
+    }
+  }
+}
