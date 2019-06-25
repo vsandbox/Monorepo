@@ -1,10 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-interface IActionContext {
-  isCancelled: boolean;
-};
-const checkFileNameInDir = (ctx: IActionContext, cwdAbsPath: string, fileName: string) => {
+export const checkFileNameInDir = (cwdAbsPath: string, fileName: string) => {
   return new Promise<boolean>((resolve, reject) => {
     fs.access(cwdAbsPath, (err) => {
       if (err) {
@@ -12,17 +9,9 @@ const checkFileNameInDir = (ctx: IActionContext, cwdAbsPath: string, fileName: s
         return;
       }
 
-      if (ctx.isCancelled) {
-        return;
-      }
-
       fs.stat(cwdAbsPath, (err, stats) => {
         if (err) {
           reject(err);
-          return;
-        }
-
-        if (ctx.isCancelled) {
           return;
         }
 
@@ -34,10 +23,6 @@ const checkFileNameInDir = (ctx: IActionContext, cwdAbsPath: string, fileName: s
         fs.readdir(cwdAbsPath, (err, fileNameArray: string[]) => {
           if (err) {
             reject(err);
-            return;
-          }
-
-          if (ctx.isCancelled) {
             return;
           }
 
@@ -62,9 +47,9 @@ const checkFileNameInDir = (ctx: IActionContext, cwdAbsPath: string, fileName: s
   });
 };
 
-const findFileNameUp = (ctx: IActionContext, cwdAbsPath: string, fileName: string) => {
+export const findFileNameUp = (cwdAbsPath: string, fileName: string) => {
   return new Promise<string | null>((resolve, reject) => {
-    const checkFileNameInDirPromise = checkFileNameInDir(ctx, cwdAbsPath, fileName);
+    const checkFileNameInDirPromise = checkFileNameInDir(cwdAbsPath, fileName);
     checkFileNameInDirPromise
       .then((isFileExisted) => {
         if (isFileExisted) {
@@ -79,7 +64,7 @@ const findFileNameUp = (ctx: IActionContext, cwdAbsPath: string, fileName: strin
             return;
           }
 
-          const nestedPromise = findFileNameUp(ctx, parentAbsPath, fileName);
+          const nestedPromise = findFileNameUp(parentAbsPath, fileName);
 
           nestedPromise
             .then(resolve)
@@ -89,12 +74,3 @@ const findFileNameUp = (ctx: IActionContext, cwdAbsPath: string, fileName: strin
       .catch(reject);
   });
 };
-
-findFileNameUp({ isCancelled: false }, process.cwd(), "mr.json")
-  .then((fileName) => {
-    console.log("FileName", fileName);
-  })
-  .catch(err => {
-    console.log(err);
-  });
-

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@vladnets/util--ts-monorepo",
+  "name": "@vladnets/test--server",
   "version": "1.0.0-alpha.0",
   "description": "",
   "main": "dist/index.js",

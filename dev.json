@@ -1,0 +1,17 @@
+{
+  "webpackConfigurations": {
+    "default": {
+
+      "@vladnets/test--server": {
+        "watch": true
+      },
+
+      "@vladnets/test--client": {
+        "devServer": {
+          "port": 8080
+        }
+      }
+
+    }
+  }
+}
