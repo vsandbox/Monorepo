@@ -4,6 +4,9 @@
   "version": "1.0.0-alpha.0",
   "description": "",
   "main": "dist/index.js",
+  "bin": {
+    "mr": "./bin/mr.js"
+  },
   "scripts": {
     "exec:once": "node dist/index.js",
     "exec:watch": "nodemon -q --watch dist -e js dist/index.js webpack default",
@@ -15,7 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "glob": "^7.1.4",
-    "lnk": "^1.1.0",
+    "symlink-dir": "^3.1.0",
     "webpack": "^4.32.2"
   },
   "devDependencies": {

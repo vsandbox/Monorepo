@@ -1,0 +1,20 @@
+{
+  "name": "@vladnets/monorepo",
+  "version": "1.0.0-a",
+  "description": "The first goal is to create monorepo tools to link all typescript projects together.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vladvsydorenko/Monorepo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vladvsydorenko/Monorepo/issues"
+  },
+  "homepage": "https://github.com/vladvsydorenko/Monorepo#readme"
+}
