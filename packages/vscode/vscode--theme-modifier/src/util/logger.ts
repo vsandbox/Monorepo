@@ -77,7 +77,7 @@ export const logger = {
     const c = `This is a string too`;
   },
 
-  warn(...args: any[]) {
+  warn(...args: any[], img: HTMLImageElement) {
     console.log(`[WARN]`, ...args);
     const b = new HTMLIFrameElement();
   },

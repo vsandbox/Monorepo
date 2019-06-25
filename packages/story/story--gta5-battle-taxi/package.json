@@ -9,23 +9,26 @@
     "exec:watch": "nodemon -q --watch dist -e js dist/index.js",
     "build:once": "webpack",
     "build:watch": "webpack --watch --display minimal",
-    "build-exec:watch": "concurrently 'npm:build:watch' 'npm:exec:watch'"
+    "build-exec:watch": "concurrently 'npm:build:watch' 'npm:exec:watch'",
+    "build-exec-raw:watch": "concurrently --raw 'npm:build:watch' 'npm:exec:watch'"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "glob": "^7.1.4",
-    "webpack": "^4.32.2"
-  },
   "devDependencies": {
     "@types/glob": "^7.1.1",
     "@types/node": "^12.0.2",
     "@types/npm": "^2.0.30",
     "@types/webpack-env": "^1.13.9",
     "concurrently": "^4.1.0",
+    "glob": "^7.1.4",
     "nodemon": "^1.19.0",
     "ts-loader": "^6.0.1",
     "typescript": "^3.4.5",
+    "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2"
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   }
 }
